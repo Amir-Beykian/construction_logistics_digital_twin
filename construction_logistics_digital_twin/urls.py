@@ -16,6 +16,8 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from .views import index
+
 
 urlpatterns = [
     path('admin/', admin.site.urls),
@@ -24,5 +26,6 @@ urlpatterns = [
     path('api/suppliers/', include('suppliers.urls')),
     path('api/bouwhubs/', include('bouwhubs.urls')),
     path('api/vehicles/', include('vehicles.urls')),
+    path('', index, name="index"),  # Serve React from Django
 
 ]

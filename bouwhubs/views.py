@@ -9,3 +9,14 @@ class BouwhubListCreateView(generics.ListCreateAPIView):
     queryset = Bouwhub.objects.all()
     serializer_class = BouwhubSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from .models import Bouwhub
+
+@api_view(['GET'])
+def bouwhub_locations(request):
+    bouwhubs = Bouwhub.objects.all()
+    data = [{"name": b.name, "latitude": b.latitude, "longitude": b.longitude} for b in bouwhubs]
+    return Response(data)

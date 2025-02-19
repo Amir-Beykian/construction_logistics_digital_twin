@@ -9,3 +9,14 @@ class SupplierListCreateView(generics.ListCreateAPIView):
     queryset = Supplier.objects.all()
     serializer_class = SupplierSerializer
     permission_classes = [permissions.IsAuthenticated]
+
+
+from rest_framework.decorators import api_view
+from rest_framework.response import Response
+from .models import Supplier
+
+@api_view(['GET'])
+def supplier_locations(request):
+    suppliers = Supplier.objects.all()
+    data = [{"name": s.name, "latitude": s.latitude, "longitude": s.longitude} for s in suppliers]
+    return Response(data)

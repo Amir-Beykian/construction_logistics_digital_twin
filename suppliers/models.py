@@ -1,19 +1,12 @@
+from django.conf import settings
 from django.db import models
-from django.contrib.auth import get_user_model
-
-User = get_user_model()
 
 class Supplier(models.Model):
-    """
-    Represents a supplier who provides construction materials.
-    """
-    name = models.CharField(max_length=255)  # Supplier name
-    owner = models.ForeignKey(User, on_delete=models.CASCADE, limit_choices_to={'role': 'supplier'})  # Only suppliers can own supplier profiles
-    location = models.CharField(max_length=255)  # Address of the supplier
-    latitude = models.FloatField()  # GIS support
-    longitude = models.FloatField()  # GIS support
-    available_materials = models.JSONField(default=dict)  # Stores available materials (e.g., {"cement": 500, "bricks": 2000})
-    created_at = models.DateTimeField(auto_now_add=True)  # Timestamp
+    owner = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    name = models.CharField(max_length=255)
+    location = models.CharField(max_length=255, blank=True, null=True)
+    latitude = models.FloatField(blank=True, null=True)
+    longitude = models.FloatField(blank=True, null=True)
 
     def __str__(self):
-        return f"{self.name} ({self.owner.username})"
+        return self.name

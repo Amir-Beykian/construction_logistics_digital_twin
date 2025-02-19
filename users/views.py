@@ -1,33 +1,44 @@
-from rest_framework import generics
-from rest_framework.permissions import AllowAny
 from rest_framework.response import Response
-from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework.decorators import api_view
+from rest_framework import status
 from django.contrib.auth import get_user_model
-from .serializers import UserRegistrationSerializer
+from django.contrib.auth.hashers import make_password
+from rest_framework_simplejwt.tokens import RefreshToken
+from .models import CustomUser
 
 User = get_user_model()
 
-class RegisterUserView(generics.CreateAPIView):
-    """
-    API endpoint for user registration.
-    Returns JWT access and refresh tokens on successful registration.
-    """
-    queryset = User.objects.all()
-    serializer_class = UserRegistrationSerializer
-    permission_classes = [AllowAny]  # Allows anyone to register without authentication
+@api_view(['POST'])
+def register_user(request):
+    """Handles user registration."""
+    data = request.data
+    if User.objects.filter(username=data['username']).exists():
+        return Response({"error": "Username already exists"}, status=status.HTTP_400_BAD_REQUEST)
 
-    def create(self, request, *args, **kwargs):
-        """
-        Custom create method to generate JWT tokens after user registration.
-        """
-        serializer = self.get_serializer(data=request.data)
-        serializer.is_valid(raise_exception=True)  # Validates input data
-        user = serializer.save()
-        refresh = RefreshToken.for_user(user)  # Generates JWT tokens
+    user = User.objects.create(
+        username=data['username'],
+        email=data['email'],
+        password=make_password(data['password']),
+        role=data['role']  # Assign role from request
+    )
 
-        return Response({
-            "user_id": user.id,
-            "username": user.username,
-            "refresh_token": str(refresh),
-            "access_token": str(refresh.access_token),
-        })
+    return Response({"message": "User registered successfully"}, status=status.HTTP_201_CREATED)
+
+@api_view(['POST'])
+def login_user(request):
+    """Handles user login and returns JWT tokens."""
+    data = request.data
+    try:
+        user = User.objects.get(username=data['username'])
+        if not user.check_password(data['password']):
+            return Response({"error": "Invalid credentials"}, status=status.HTTP_400_BAD_REQUEST)
+    except User.DoesNotExist:
+        return Response({"error": "User not found"}, status=status.HTTP_400_BAD_REQUEST)
+
+    # Generate JWT tokens
+    refresh = RefreshToken.for_user(user)
+    return Response({
+        "refresh": str(refresh),
+        "access": str(refresh.access_token),
+        "role": user.role
+    })

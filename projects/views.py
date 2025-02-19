@@ -1,11 +1,8 @@
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
-from django.conf import settings
-from .models import Project
-from users.models import CustomUser  # Ensure you have the correct import
 from django.shortcuts import get_object_or_404
-
+from .models import Project
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -29,7 +26,7 @@ def create_project(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def list_projects(request):
-    """Returns all projects owned by the authenticated user."""
+    """Returns all projects owned by the authenticated project user."""
     if request.user.role != "project":
         return Response({"error": "Unauthorized"}, status=403)
 

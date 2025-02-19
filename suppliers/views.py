@@ -1,11 +1,8 @@
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
-from django.conf import settings
-from .models import Supplier
-from users.models import CustomUser
 from django.shortcuts import get_object_or_404
-
+from .models import Supplier
 
 @api_view(['POST'])
 @permission_classes([IsAuthenticated])
@@ -34,7 +31,7 @@ def list_supplier_orders(request):
         return Response({"error": "Unauthorized"}, status=403)
 
     # Fetch orders from the database (placeholder example)
-    orders = []  # You will replace this with actual queries.
+    orders = []  # Replace with actual queries.
 
     return Response({"supplier_orders": orders})
 

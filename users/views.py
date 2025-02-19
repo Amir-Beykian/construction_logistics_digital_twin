@@ -1,10 +1,10 @@
 from rest_framework.response import Response
-from rest_framework.decorators import api_view
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework import status
+from rest_framework.permissions import IsAuthenticated
 from django.contrib.auth import get_user_model
 from django.contrib.auth.hashers import make_password
 from rest_framework_simplejwt.tokens import RefreshToken
-from .models import CustomUser
 
 User = get_user_model()
 
@@ -41,4 +41,14 @@ def login_user(request):
         "refresh": str(refresh),
         "access": str(refresh.access_token),
         "role": user.role
+    })
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_user_details(request):
+    """Returns user details for authenticated users."""
+    return Response({
+        "username": request.user.username,
+        "email": request.user.email,
+        "role": request.user.role
     })

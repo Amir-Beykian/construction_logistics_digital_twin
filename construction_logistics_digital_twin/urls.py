@@ -20,6 +20,7 @@ from .views import index
 
 
 urlpatterns = [
+
     path('admin/', admin.site.urls),
     path('api/users/', include('users.urls')),  # Includes user authentication APIs
     path('api/projects/', include('projects.urls')),
